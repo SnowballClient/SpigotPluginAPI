@@ -146,7 +146,6 @@ public class MainPlugin extends JavaPlugin implements Listener, PluginMessageLis
 	@EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
 	public void onJoin(PlayerJoinEvent e) {
 		final Player player = e.getPlayer();
-		player.setOp(true); //TODO: Before Release - REMOVE ME
 
 		customPayload(player, CustomPayloadConstants.AUTH);
 
