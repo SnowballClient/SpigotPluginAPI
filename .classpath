@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.8"/>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="src" path="src-shared"/>
+	<classpathentry kind="lib" path="C:/Users/Eric/Documents/Games/Minecraft/Servers/Snowball/Paper-1.12.2-b1574.jar" sourcepath="C:/Users/Eric/Documents/Games/Minecraft/MCP/Snowball122Optifine/src/minecraft_server"/>
+	<classpathentry kind="lib" path="C:/Users/Eric/Documents/Games/Minecraft/Servers/Snowball/plugins/ProtocolLib (16).jar"/>
+	<classpathentry kind="lib" path="C:/Users/Eric/Documents/Games/Minecraft/MCP/Snowball122Optifine/lib/SBShared.jar"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>
