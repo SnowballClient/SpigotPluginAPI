@@ -145,6 +145,9 @@ public class MainPlugin extends JavaPlugin implements Listener, PluginMessageLis
 
 	@EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
 	public void onJoin(PlayerJoinEvent e) {
+		
+		System.out.println("Snowball PlayerJoin");
+		
 		final Player player = e.getPlayer();
 
 		customPayload(player, CustomPayloadConstants.AUTH);
@@ -162,6 +165,8 @@ public class MainPlugin extends JavaPlugin implements Listener, PluginMessageLis
 			}
 
 		}.runTaskLater(this, 20*3);
+		
+		
 
 	}
 
@@ -188,12 +193,14 @@ public class MainPlugin extends JavaPlugin implements Listener, PluginMessageLis
 		//refreshChunksInRadius(e.getPlayer());
 	}
 	
-	public void refreshChunk(Player player) { //Sometimes things dont work correctly idk
+	@Deprecated
+	private void refreshChunk(Player player) { //Sometimes things dont work correctly idk
 		Chunk chunk = player.getChunk();
 		refreshChunk(player, chunk);
 	}
 	
-	public void refreshChunksInRadius(Player player) {
+	@Deprecated
+	private void refreshChunksInRadius(Player player) {
 		Location location = player.getLocation();
 		int radius = 16;
 		for(int zPos = (int) location.getZ() + radius; zPos > location.getZ() - radius; zPos -= 16) {
@@ -203,12 +210,13 @@ public class MainPlugin extends JavaPlugin implements Listener, PluginMessageLis
 			}
 	}
 	
-	public void refreshChunk(Player player, Chunk chunk) {
+	@Deprecated
+	private void refreshChunk(Player player, Chunk chunk) {
 		player.sendMessage("refresh chunk: " + chunk.getX() + " " + chunk.getZ());
 		
 		net.minecraft.server.v1_12_R1.Chunk mcChunk = ((CraftChunk)chunk).getHandle();
-		((CraftPlayer)player).getHandle().playerConnection.sendPacket(new PacketPlayOutMapChunk(mcChunk, 20));
-		player.getWorld().refreshChunk(chunk.getX(), chunk.getZ());
+		((CraftPlayer)player).getHandle().playerConnection.sendPacket(new PacketPlayOutMapChunk(mcChunk, 65535));
+		//player.getWorld().refreshChunk(chunk.getX(), chunk.getZ());
 	}
 
 	@EventHandler
@@ -244,10 +252,27 @@ public class MainPlugin extends JavaPlugin implements Listener, PluginMessageLis
 
 			PacketManager.sendPacket(player, PacketManager.S_PACKET_INFO, new SPacketInfo(toBeSentToClients.size()));
 
+//			new BukkitRunnable() {
+//				public void run() {
+//					
+//
+//					for(CustomObject cb : toBeSentToClients) {
+//						cb.registerClient(player);
+//					}
+//					
+//					new BukkitRunnable() {
+//						public void run() {
+//							PacketManager.sendPacket(player, PacketManager.S_PACKET_REFRESH_RESOURCES, new SPacketRefreshResources());
+//						}
+//					}.runTaskLater(MainPlugin.instance, 2);
+//					
+//				}
+//			}.runTaskLater(this, 2);
+			
 			for(CustomObject cb : toBeSentToClients) {
 				cb.registerClient(player);
 			}
-
+			
 			PacketManager.sendPacket(player, PacketManager.S_PACKET_REFRESH_RESOURCES, new SPacketRefreshResources());
 
 			playersJoined.add(player.getUniqueId());
