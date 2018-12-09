@@ -6,3 +6,4 @@ depend: [ProtocolLib]
 author: Eric Golde
 website: https://eric.golde.org/
 load: STARTUP
+loadbefore: [HolographicDisplays]
