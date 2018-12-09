@@ -86,6 +86,10 @@ public class MainPlugin extends JavaPlugin implements Listener, PluginMessageLis
 		}.runTaskLater(this, 2);
 	}
 	
+	public static String getWorldName() {
+		return WORLD_NAME;
+	}
+	
 	private void doWorldGeneration() {
 		getLogger().info("Generating snowball fix world...");
 		WorldCreator wc = new WorldCreator(WORLD_NAME);
@@ -187,17 +191,18 @@ public class MainPlugin extends JavaPlugin implements Listener, PluginMessageLis
 			@Override
 			public void run() {
 				
-				final Location PLAYER_LOCATION = player.getLocation();
-				Location newLoc = PLAYER_LOCATION.clone();
-				newLoc.setWorld(Bukkit.getWorld(WORLD_NAME));
-				player.teleport(newLoc, TeleportCause.PLUGIN);
-				
-				new BukkitRunnable() {
-					@Override
-					public void run() {
-						player.teleport(PLAYER_LOCATION, TeleportCause.PLUGIN);
-					}
-				}.runTaskLater(instance, 2);
+//				final Location PLAYER_LOCATION = player.getLocation();
+//				Location newLoc = PLAYER_LOCATION.clone();
+//				newLoc.setWorld(Bukkit.getWorld(WORLD_NAME));
+//				player.teleport(newLoc, TeleportCause.PLUGIN);
+//				
+//				new BukkitRunnable() {
+//					@Override
+//					public void run() {
+//						player.teleport(PLAYER_LOCATION, TeleportCause.PLUGIN);
+//					}
+//				}.runTaskLater(instance, 2);
+				getOrCreateSnowballPlayer(player).refreshClientWorld();
 				
 			}
 		}.runTaskLater(this, 10);
@@ -260,7 +265,7 @@ public class MainPlugin extends JavaPlugin implements Listener, PluginMessageLis
 				
 				PacketManager.sendPacket(player, PacketManager.S_PACKET_REFRESH_RESOURCES, new SPacketRefreshResources());
 			}
-		}.runTaskLater(this, 0);
+		}.runTaskLater(this, 0); //Yeah, run task later 0 ticks works... 1 and no-delay fail. Its strange.
 		
 	}
 

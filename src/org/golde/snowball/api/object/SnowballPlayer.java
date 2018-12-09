@@ -4,8 +4,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.entity.Player;
+import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.scheduler.BukkitRunnable;
+import org.golde.snowball.plugin.MainPlugin;
 import org.golde.snowball.plugin.PacketManager;
 import org.golde.snowball.plugin.packets.server.SPacketShowToast;
 import org.golde.snowball.plugin.packets.server.SPacketUpdatePlayerLooks;
@@ -83,6 +87,20 @@ public class SnowballPlayer {
 		for(Player p : Bukkit.getOnlinePlayers()) {
 			PacketManager.sendPacket(p, PacketManager.S_PACKET_UPDATE_PLAYER_LOOKS, new SPacketUpdatePlayerLooks(player, skinUrl, customUsername, cosmetics)); //Change to a updateCustomisations() function so you can change a lot of things then push it all at once to the client?
 		}
+	}
+	
+	public void refreshClientWorld() {
+		final Location PLAYER_LOCATION = player.getLocation();
+		Location newLoc = PLAYER_LOCATION.clone();
+		newLoc.setWorld(Bukkit.getWorld(MainPlugin.getInstance().getWorldName()));
+		player.teleport(newLoc, TeleportCause.PLUGIN);
+		
+		new BukkitRunnable() {
+			@Override
+			public void run() {
+				player.teleport(PLAYER_LOCATION, TeleportCause.PLUGIN);
+			}
+		}.runTaskLater(MainPlugin.getInstance(), 2);
 	}
 
 }
