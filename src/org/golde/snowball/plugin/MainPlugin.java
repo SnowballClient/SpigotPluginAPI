@@ -11,6 +11,9 @@ import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.WorldCreator;
+import org.bukkit.WorldType;
+import org.bukkit.World.Environment;
 import org.bukkit.craftbukkit.v1_12_R1.CraftChunk;
 import org.bukkit.craftbukkit.v1_12_R1.entity.CraftPlayer;
 import org.bukkit.enchantments.Enchantment;
@@ -19,9 +22,11 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
+import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.plugin.messaging.PluginMessageListener;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -52,9 +57,11 @@ public class MainPlugin extends JavaPlugin implements Listener, PluginMessageLis
 	private static MainPlugin instance;
 	private List<CustomObject> toBeSentToClients = new ArrayList<CustomObject>();
 	public final List<CustomObject> addedByAPI = new ArrayList<CustomObject>();
-	private List<UUID> playersJoined = new ArrayList<UUID>();
-	private HashMap<UUID, SnowballPlayer> snowballPlayers = new HashMap<UUID, SnowballPlayer>();
 
+	private HashMap<UUID, SnowballPlayer> snowballPlayers = new HashMap<UUID, SnowballPlayer>();
+	
+	private static final String WORLD_NAME = "snowball";
+	
 	@Override
 	public void onEnable() {
 		instance = this;
@@ -71,7 +78,22 @@ public class MainPlugin extends JavaPlugin implements Listener, PluginMessageLis
 		getLogger().info("Registering blocks and items...");
 		registerBlocksAndItems();
 
-
+		new BukkitRunnable() {
+			public void run() {
+				doWorldGeneration();
+			}
+		}.runTaskLater(this, 2);
+	}
+	
+	private void doWorldGeneration() {
+		getLogger().info("Generating snowball fix world...");
+		WorldCreator wc = new WorldCreator(WORLD_NAME);
+		wc.generateStructures(false);
+		wc.type(WorldType.FLAT);
+		wc.seed(0);
+		wc.environment(Environment.NORMAL);
+		wc.generatorSettings("3;70*minecraft:air,minecraft:barrier;1");
+		Bukkit.createWorld(wc);
 	}
 
 	private void registerBlocksAndItems() {
@@ -146,35 +168,27 @@ public class MainPlugin extends JavaPlugin implements Listener, PluginMessageLis
 	@EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
 	public void onJoin(PlayerJoinEvent e) {
 		
-		System.out.println("Snowball PlayerJoin");
-		
 		final Player player = e.getPlayer();
-
-		customPayload(player, CustomPayloadConstants.AUTH);
-
+		
 		new BukkitRunnable() {
-
 			@Override
 			public void run() {
-				if(playersJoined.contains(player.getUniqueId())) {
-					playersJoined.remove(player.getUniqueId());
-				}
-				else {
-					player.kickPlayer("You must use the snowball client to join!");
-				}
+				
+				final Location PLAYER_LOCATION = player.getLocation();
+				Location newLoc = PLAYER_LOCATION.clone();
+				newLoc.setWorld(Bukkit.getWorld(WORLD_NAME));
+				player.teleport(newLoc, TeleportCause.PLUGIN);
+				
+				new BukkitRunnable() {
+					@Override
+					public void run() {
+						player.teleport(PLAYER_LOCATION, TeleportCause.PLUGIN);
+					}
+				}.runTaskLater(instance, 2);
+				
 			}
+		}.runTaskLater(this, 10);
 
-		}.runTaskLater(this, 20*3);
-		
-		
-
-	}
-
-	@EventHandler(ignoreCancelled=true)
-	public void playerMove(PlayerMoveEvent e) {
-		if (!e.getFrom().getChunk().equals(e.getTo().getChunk())) {
-			//refreshChunksInRadius(e.getPlayer());
-		}
 	}
 	
 	public SnowballPlayer getOrCreateSnowballPlayer(Player player) {
@@ -186,37 +200,6 @@ public class MainPlugin extends JavaPlugin implements Listener, PluginMessageLis
 			snowballPlayers.put(player.getUniqueId(), toReturn);
 			return toReturn;
 		}
-	}
-	
-	@EventHandler(ignoreCancelled=true)
-	public void playerTeleport(PlayerTeleportEvent e) {
-		//refreshChunksInRadius(e.getPlayer());
-	}
-	
-	@Deprecated
-	private void refreshChunk(Player player) { //Sometimes things dont work correctly idk
-		Chunk chunk = player.getChunk();
-		refreshChunk(player, chunk);
-	}
-	
-	@Deprecated
-	private void refreshChunksInRadius(Player player) {
-		Location location = player.getLocation();
-		int radius = 16;
-		for(int zPos = (int) location.getZ() + radius; zPos > location.getZ() - radius; zPos -= 16) {
-			   for(int xPos = (int) location.getX() + radius; xPos > location.getX() - radius; xPos -= 16) { //start at the topmost corner (x & z). Run once for every 16 blocks - once a chunk.
-				   refreshChunk(player, player.getWorld().getChunkAt(new Location(player.getWorld(), xPos, 0, zPos)));
-			   }
-			}
-	}
-	
-	@Deprecated
-	private void refreshChunk(Player player, Chunk chunk) {
-		player.sendMessage("refresh chunk: " + chunk.getX() + " " + chunk.getZ());
-		
-		net.minecraft.server.v1_12_R1.Chunk mcChunk = ((CraftChunk)chunk).getHandle();
-		((CraftPlayer)player).getHandle().playerConnection.sendPacket(new PacketPlayOutMapChunk(mcChunk, 65535));
-		//player.getWorld().refreshChunk(chunk.getX(), chunk.getZ());
 	}
 
 	@EventHandler
@@ -241,42 +224,31 @@ public class MainPlugin extends JavaPlugin implements Listener, PluginMessageLis
 
 	@Override
 	public void onPluginMessageReceived(String channel, Player player, byte[] rawdata) {
-		//Bukkit.getLogger().info("I recieved: " + Arrays.toString(rawdata) + " (" + new String(rawdata) + ")");
+		
 		byte[] newdata = Arrays.copyOfRange(rawdata, 1, rawdata.length); //first byte of the string is a check byte of the length of the string passed
-		//Bukkit.getLogger().info("I recieved2: " + Arrays.toString(newdata) + " (" + new String(newdata) + ")");
 		String data = new String(newdata);
 
 
-		if(data.equalsIgnoreCase(CustomPayloadConstants.AUTH)) {
-			//Bukkit.broadcastMessage(player.getName() + " is using Snowball!");
-
-			PacketManager.sendPacket(player, PacketManager.S_PACKET_INFO, new SPacketInfo(toBeSentToClients.size()));
-
-//			new BukkitRunnable() {
-//				public void run() {
-//					
-//
-//					for(CustomObject cb : toBeSentToClients) {
-//						cb.registerClient(player);
-//					}
-//					
-//					new BukkitRunnable() {
-//						public void run() {
-//							PacketManager.sendPacket(player, PacketManager.S_PACKET_REFRESH_RESOURCES, new SPacketRefreshResources());
-//						}
-//					}.runTaskLater(MainPlugin.instance, 2);
-//					
-//				}
-//			}.runTaskLater(this, 2);
-			
-			for(CustomObject cb : toBeSentToClients) {
-				cb.registerClient(player);
+		
+	}
+	
+	@EventHandler
+	public void onPlayerLogin(PlayerLoginEvent e) {
+		
+		new BukkitRunnable() {
+			@Override
+			public void run() {
+				final Player player = e.getPlayer();
+				
+				PacketManager.sendPacket(player, PacketManager.S_PACKET_INFO, new SPacketInfo(toBeSentToClients.size()));
+				for(CustomObject cb : toBeSentToClients) {
+					cb.registerClient(player);
+				}
+				
+				PacketManager.sendPacket(player, PacketManager.S_PACKET_REFRESH_RESOURCES, new SPacketRefreshResources());
 			}
-			
-			PacketManager.sendPacket(player, PacketManager.S_PACKET_REFRESH_RESOURCES, new SPacketRefreshResources());
-
-			playersJoined.add(player.getUniqueId());
-		}
+		}.runTaskLater(this, 0);
+		
 	}
 
 }

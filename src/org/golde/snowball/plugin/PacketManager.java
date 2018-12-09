@@ -77,7 +77,7 @@ public class PacketManager {
 		Map<Class<?>, EnumProtocol> map = (Map<Class<?>, EnumProtocol>) Accessors.getFieldAccessor(EnumProtocol.class, Map.class, true).get(protocol);
 		map.put(packetClass, protocol);
 		
-		MainPlugin.getInstance().getLogger().info("Registered '" + packetClass.getCanonicalName() + "' with id " + packetId);
+		MainPlugin.getInstance().getLogger().info("Registered '" + packetClass.getSimpleName() + "' with id " + packetId );
 		
 		ProtocolLibrary.getProtocolManager().addPacketListener(new PacketAdapter(MainPlugin.getInstance(), packetType) {
 			@Override
@@ -95,6 +95,8 @@ public class PacketManager {
 	public static final void sendPacket(Player player, PacketType packetType, SnowballPacket packet) {
 		PacketContainer container = new PacketContainer(packetType, packet);
 
+		System.out.println("Sending packet '" + packet.getClass().getSimpleName() + "' to player '" + player.getName() + "'");
+		
 		try {
 			ProtocolLibrary.getProtocolManager().sendServerPacket(player, container);
 		} catch (InvocationTargetException e) {
