@@ -21,6 +21,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
@@ -163,6 +164,18 @@ public class MainPlugin extends JavaPlugin implements Listener, PluginMessageLis
 		ReflectionHelper.setPrivateValue(Material.class, null, BY_NAME, "BY_NAME");
 	}
 
+	@EventHandler
+	public void changeWorldEvent(final PlayerChangedWorldEvent e) {
+		
+		new BukkitRunnable() {
+			
+			@Override
+			public void run() {
+				customPayload(e.getPlayer(), CustomPayloadConstants.RESPAWN);
+			}
+		}.runTaskLater(this, 5);
+		
+	}
 
 
 	@EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
