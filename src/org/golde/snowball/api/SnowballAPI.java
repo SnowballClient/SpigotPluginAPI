@@ -28,18 +28,15 @@ public class SnowballAPI {
 	
 	public void addBlock(CustomBlock block) {
 		//block.do_not_use_setRegistryName(pluginIdentifier);
-		System.out.println("API: ADDED: " + block.getClass().getName());
 		OBJECTS.add(block);
 	}
 	
 	public void addItem(CustomItem item) {
 		//item.do_not_use_setRegistryName(pluginIdentifier);
-		System.out.println("API: ADDED: " +item.getClass().getName());
 		OBJECTS.add(item);
 	}
 	
 	public void addEnchantment(CustomEnchantment ench) {
-		System.out.println("API: ADDED: " + ench.getClass().getName());
 		OBJECTS.add(ench);
 	}
 	
