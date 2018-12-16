@@ -1,6 +1,6 @@
 main: org.golde.snowball.plugin.MainPlugin
 name: SnowballAPI
-version: 1.0
+version: 1.0.0
 description: "A API for the Snowball Client"
 depend: [ProtocolLib]
 author: Eric Golde
