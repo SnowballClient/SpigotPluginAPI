@@ -2,7 +2,6 @@ package org.golde.snowball.plugin;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -29,7 +28,6 @@ import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.plugin.messaging.PluginMessageListener;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.golde.snowball.Dumb;
 import org.golde.snowball.api.SnowballAPI;
 import org.golde.snowball.api.object.CustomCreativeTab;
 import org.golde.snowball.api.object.SnowballPlayer;
@@ -40,11 +38,8 @@ import org.golde.snowball.plugin.util.ReflectionHelper;
 import org.golde.snowball.shared.CustomPayloadConstants;
 
 import io.netty.buffer.Unpooled;
-import net.minecraft.server.v1_12_R1.ChatComponentText;
-import net.minecraft.server.v1_12_R1.EnumProtocol;
 import net.minecraft.server.v1_12_R1.PacketDataSerializer;
 import net.minecraft.server.v1_12_R1.PacketPlayOutCustomPayload;
-import net.minecraft.server.v1_12_R1.PacketPlayOutKickDisconnect;
 
 public class MainPlugin extends JavaPlugin implements Listener, PluginMessageListener {
 
@@ -219,10 +214,17 @@ public class MainPlugin extends JavaPlugin implements Listener, PluginMessageLis
 	@EventHandler
 	public void onPlayerLogin(PlayerLoginEvent e) {
 
-		if(!Dumb.HAS_RECIEVED_PACKET) {
-			e.disallow(Result.KICK_OTHER, "PLEASE WORK");
-		}
+		String[] ipSplit = e.getHostname().split(":");
+		String hostName = ipSplit[0];
+		int port = Integer.parseInt(ipSplit[1]);
 		
+		//System.out.println("Arr: " + Dumb.IS_SNOWBALL_CLIENT.toString());
+		if(port != 0) {
+			e.disallow(Result.KICK_OTHER, "You need the snowball client in order to join this server");
+		}
+		else {
+			//Dumb.IS_SNOWBALL_CLIENT.remove(e.getPlayer().getName());
+		}
 		new BukkitRunnable() {
 			@Override
 			public void run() {

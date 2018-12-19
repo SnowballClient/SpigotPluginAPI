@@ -5,7 +5,6 @@ import java.util.Map;
 
 import org.apache.commons.lang.reflect.FieldUtils;
 import org.bukkit.entity.Player;
-import org.golde.snowball.Dumb;
 import org.golde.snowball.plugin.packets.PacketIds;
 import org.golde.snowball.plugin.packets.SnowballPacket;
 import org.golde.snowball.plugin.packets.client.CPacketKeyPress;
@@ -107,8 +106,6 @@ public class PacketManager {
 			}
 			
 		});
-		
-		Dumb.onEnable();
 	}
 	
 	public static final void sendPacket(Player player, PacketType packetType, SnowballPacket packet) {
