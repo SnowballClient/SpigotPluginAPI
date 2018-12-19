@@ -5,10 +5,12 @@ import java.util.Map;
 
 import org.apache.commons.lang.reflect.FieldUtils;
 import org.bukkit.entity.Player;
+import org.golde.snowball.Dumb;
 import org.golde.snowball.plugin.packets.PacketIds;
 import org.golde.snowball.plugin.packets.SnowballPacket;
 import org.golde.snowball.plugin.packets.client.CPacketKeyPress;
 import org.golde.snowball.plugin.packets.server.SPacketAddBlock;
+import org.golde.snowball.plugin.packets.server.SPacketAddCreativeTab;
 import org.golde.snowball.plugin.packets.server.SPacketAddEnchantment;
 import org.golde.snowball.plugin.packets.server.SPacketAddItem;
 import org.golde.snowball.plugin.packets.server.SPacketInfo;
@@ -24,6 +26,7 @@ import com.comphenix.protocol.events.PacketAdapter;
 import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.events.PacketEvent;
 import com.comphenix.protocol.reflect.accessors.Accessors;
+import com.comphenix.protocol.wrappers.WrappedServerPing;
 import com.google.common.collect.BiMap;
 
 import net.minecraft.server.v1_12_R1.EnumProtocol;
@@ -39,6 +42,7 @@ public class PacketManager {
 	public static final PacketType S_PACKET_UPDATE_PLAYER_LOOKS = new PacketType(Protocol.PLAY, Sender.SERVER, PacketIds.SPacketUpdatePlayerLooks, -1);
 	public static final PacketType S_PACKET_SHOW_TOAST = new PacketType(Protocol.PLAY, Sender.SERVER, PacketIds.SPacketShowToast, -1);
 	public static final PacketType S_PACKET_ADD_ENCHANTMENT = new PacketType(Protocol.PLAY, Sender.SERVER, PacketIds.SPacketAddEnchantment, -1);
+	public static final PacketType S_PACKET_ADD_CREATIVE_TAB = new PacketType(Protocol.PLAY, Sender.SERVER, PacketIds.SPacketAddCreativeTab, -1);
 	
 	public static final PacketType C_PACKET_KEYPRESS = new PacketType(Protocol.PLAY, Sender.CLIENT, PacketIds.CPacketKeyPress, -1);
 	
@@ -51,6 +55,7 @@ public class PacketManager {
 		registerPacket(SPacketUpdatePlayerLooks.class, S_PACKET_UPDATE_PLAYER_LOOKS);
 		registerPacket(SPacketShowToast.class, S_PACKET_SHOW_TOAST);
 		registerPacket(SPacketAddEnchantment.class, S_PACKET_ADD_ENCHANTMENT);
+		registerPacket(SPacketAddCreativeTab.class, S_PACKET_ADD_CREATIVE_TAB);
 		
 		registerPacket(CPacketKeyPress.class, C_PACKET_KEYPRESS);
 		
@@ -91,6 +96,19 @@ public class PacketManager {
 				//System.out.println("onPacketReceiving " + event.getPacket().getHandle());
 			}
 		});
+		
+		ProtocolLibrary.getProtocolManager().addPacketListener(new PacketAdapter(MainPlugin.getInstance(), PacketType.Status.Server.SERVER_INFO) {
+			
+			@Override
+			public void onPacketSending(PacketEvent event) {
+				WrappedServerPing ping = (WrappedServerPing)event.getPacket().getServerPings().read(0);
+				ping.setVersionProtocol(-89294);
+				ping.setVersionName("Snowball v1.0.0");
+			}
+			
+		});
+		
+		Dumb.onEnable();
 	}
 	
 	public static final void sendPacket(Player player, PacketType packetType, SnowballPacket packet) {

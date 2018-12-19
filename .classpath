@@ -6,5 +6,6 @@
 	<classpathentry kind="lib" path="C:/Users/Eric/Documents/Games/Minecraft/SnowballClient/Server/Paper-1.12.2-b1574.jar" sourcepath="C:/Users/Eric/Documents/Games/Minecraft/MCP/Snowball122Optifine/src/minecraft_server"/>
 	<classpathentry kind="lib" path="C:/Users/Eric/Documents/Games/Minecraft/SnowballClient/Server/plugins/ProtocolLib (16).jar"/>
 	<classpathentry kind="lib" path="C:/Users/Eric/Documents/Games/Minecraft/MCP/Snowball122Optifine/lib/SBShared.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Eric/Documents/Games/Minecraft/SnowballClient/Server/plugins/PacketListenerAPI_v3.7.1-SNAPSHOT.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

@@ -2,6 +2,9 @@ package org.golde.snowball.plugin;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -21,11 +24,14 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerLoginEvent;
+import org.bukkit.event.player.PlayerLoginEvent.Result;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.plugin.messaging.PluginMessageListener;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.golde.snowball.Dumb;
 import org.golde.snowball.api.SnowballAPI;
+import org.golde.snowball.api.object.CustomCreativeTab;
 import org.golde.snowball.api.object.SnowballPlayer;
 import org.golde.snowball.plugin.custom.CustomObject;
 import org.golde.snowball.plugin.packets.server.SPacketInfo;
@@ -34,8 +40,11 @@ import org.golde.snowball.plugin.util.ReflectionHelper;
 import org.golde.snowball.shared.CustomPayloadConstants;
 
 import io.netty.buffer.Unpooled;
+import net.minecraft.server.v1_12_R1.ChatComponentText;
+import net.minecraft.server.v1_12_R1.EnumProtocol;
 import net.minecraft.server.v1_12_R1.PacketDataSerializer;
 import net.minecraft.server.v1_12_R1.PacketPlayOutCustomPayload;
+import net.minecraft.server.v1_12_R1.PacketPlayOutKickDisconnect;
 
 public class MainPlugin extends JavaPlugin implements Listener, PluginMessageListener {
 
@@ -44,42 +53,43 @@ public class MainPlugin extends JavaPlugin implements Listener, PluginMessageLis
 
 
 	private HashMap<UUID, SnowballPlayer> snowballPlayers = new HashMap<UUID, SnowballPlayer>();
-	
+
 	private static final String WORLD_NAME = "snowball";
-	
+
 	private boolean DEBUG = false;
-	
+
 	@Override
 	public void onEnable() {
 		instance = this;
-		
+
 		saveDefaultConfig();
 		DEBUG = getConfig().getBoolean("debug");
 
 		Bukkit.getPluginManager().registerEvents(this, this);
 		Bukkit.getMessenger().registerOutgoingPluginChannel(this, CustomPayloadConstants.CHANNEL_NAME);
 		Bukkit.getMessenger().registerIncomingPluginChannel(this, CustomPayloadConstants.CHANNEL_NAME, this);
+		Bukkit.getMessenger().registerIncomingPluginChannel(this, "MC|Brand", this);
 
 		PacketManager.registerPackets();
 
 		patchMaterialEnumSoItWontFailInTheFuture();
 
 		if(MainPlugin.getInstance().isDEBUG()) {getLogger().info("Registering blocks and items...");}
-		
+
 		registerBlocksAndItems();
 
 		new BukkitRunnable() {
 			public void run() {
 				doWorldGeneration();
-				
+
 			}
 		}.runTaskLater(this, 2);
 	}
-	
+
 	public static String getWorldName() {
 		return WORLD_NAME;
 	}
-	
+
 	private void doWorldGeneration() {
 		if(MainPlugin.getInstance().isDEBUG()) {getLogger().info("Generating snowball fix world...");}
 		WorldCreator wc = new WorldCreator(WORLD_NAME);
@@ -98,9 +108,10 @@ public class MainPlugin extends JavaPlugin implements Listener, PluginMessageLis
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		
+
 		//Bukkit.getPluginManager().callEvent(new SnowballRegistryEvent());
 
+		Collections.sort(SnowballAPI.do_not_use_me_getObjects(), customObjectComparator);
 		for(CustomObject obj : SnowballAPI.do_not_use_me_getObjects()) {
 			obj.registerServer();
 			toBeSentToClients.add(obj);
@@ -134,34 +145,34 @@ public class MainPlugin extends JavaPlugin implements Listener, PluginMessageLis
 
 	@EventHandler
 	public void changeWorldEvent(final PlayerChangedWorldEvent e) {
-		
+
 		new BukkitRunnable() {
-			
+
 			@Override
 			public void run() {
 				customPayload(e.getPlayer(), CustomPayloadConstants.RESPAWN);
 			}
 		}.runTaskLater(this, 5);
-		
+
 	}
 
 
 	@EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
 	public void onJoin(PlayerJoinEvent e) {
-		
+
 		final Player player = e.getPlayer();
-		
+
 		new BukkitRunnable() {
 			@Override
 			public void run() {
-				
+
 				getOrCreateSnowballPlayer(player).refreshClientWorld();
-				
+
 			}
 		}.runTaskLater(this, 10);
 
 	}
-	
+
 	public SnowballPlayer getOrCreateSnowballPlayer(Player player) {
 		if(snowballPlayers.containsKey(player.getUniqueId())) {
 			return snowballPlayers.get(player.getUniqueId());
@@ -193,35 +204,64 @@ public class MainPlugin extends JavaPlugin implements Listener, PluginMessageLis
 		((CraftPlayer)player).getHandle().playerConnection.sendPacket(new PacketPlayOutCustomPayload(CustomPayloadConstants.CHANNEL_NAME, data));
 	}
 
+	volatile boolean shouldKick = false;
+	
 	@Override
 	public void onPluginMessageReceived(String channel, Player player, byte[] rawdata) {
-		
+
 		byte[] newdata = Arrays.copyOfRange(rawdata, 1, rawdata.length); //first byte of the string is a check byte of the length of the string passed
 		String data = new String(newdata);
+		
+		if(DEBUG) {getLogger().info("Channel: " + channel + " msg: " + data);}
 
 	}
-	
+
 	@EventHandler
 	public void onPlayerLogin(PlayerLoginEvent e) {
+
+		if(!Dumb.HAS_RECIEVED_PACKET) {
+			e.disallow(Result.KICK_OTHER, "PLEASE WORK");
+		}
 		
 		new BukkitRunnable() {
 			@Override
 			public void run() {
 				final Player player = e.getPlayer();
-				
+
 				PacketManager.sendPacket(player, PacketManager.S_PACKET_INFO, new SPacketInfo(toBeSentToClients.size()));
 				for(CustomObject cb : toBeSentToClients) {
 					cb.registerClient(player);
 				}
-				
+
 				PacketManager.sendPacket(player, PacketManager.S_PACKET_REFRESH_RESOURCES, new SPacketRefreshResources());
 			}
 		}.runTaskLater(this, 0); //Yeah, run task later 0 ticks works... 1 and no-delay fail. Its strange.
-		
+
 	}
-	
-	public boolean isDEBUG() {
-		return DEBUG;
-	}
+
+	private static Comparator<CustomObject> customObjectComparator = new Comparator<CustomObject>() {
+
+		public int compare(CustomObject s1, CustomObject s2) {
+			String cn1 = s1.getClass().getSimpleName();
+			String cn2 = s2.getClass().getSimpleName();
+			
+			if(cn1.equals(cn2)) {
+				return 0;
+			}
+			else if(cn1.equals(CustomCreativeTab.class.getSimpleName())) {
+				return -1;
+			}
+			else if(cn2.equals(CustomCreativeTab.class.getSimpleName())){
+				return 1;
+			}
+			else {
+				return 0;
+			}
+
+		}};
+
+		public boolean isDEBUG() {
+			return DEBUG;
+		}
 
 }

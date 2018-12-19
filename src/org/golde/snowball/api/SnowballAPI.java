@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.golde.snowball.api.object.CustomCreativeTab;
 import org.golde.snowball.api.object.CustomBlock;
 import org.golde.snowball.api.object.CustomEnchantment;
 import org.golde.snowball.api.object.CustomItem;
@@ -19,7 +20,7 @@ public class SnowballAPI {
 	private static final List<CustomObject> OBJECTS = new ArrayList<CustomObject>();
 	
 	public SnowballAPI(JavaPlugin pluginInstance) {
-		this.pluginIdentifier = StringHelper.sanatise(pluginInstance.getName());
+		this.pluginIdentifier = StringHelper.sanatise(pluginInstance.getName(), true, true);
 	}
 	
 	public static SnowballAPI getInstance(JavaPlugin pluginInstance) {
@@ -38,6 +39,10 @@ public class SnowballAPI {
 	
 	public void addEnchantment(CustomEnchantment ench) {
 		OBJECTS.add(ench);
+	}
+	
+	public void addCreativeTab(CustomCreativeTab creativeTab) {
+		OBJECTS.add(creativeTab);
 	}
 	
 	public SnowballPlayer getSnowballPlayer(Player player) {

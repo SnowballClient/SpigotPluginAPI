@@ -9,7 +9,7 @@ public abstract class CustomObjectName implements CustomObject{
 	
 	public CustomObjectName(String name) {
 		this.name = name;
-		unlocalizedName = StringHelper.sanatise(name);
+		unlocalizedName = StringHelper.sanatise(name, true, false);
 	}
 	
 }
