@@ -3,7 +3,6 @@ package org.golde.snowball.api.object;
 import org.bukkit.entity.Player;
 import org.golde.snowball.api.models.ItemModel;
 import org.golde.snowball.plugin.PacketManager;
-import org.golde.snowball.plugin.custom.CustomItemFoodDrinkAbstract;
 import org.golde.snowball.plugin.packets.server.SPacketAddItem;
 
 import net.minecraft.server.v1_12_R1.CriterionTriggers;
@@ -19,7 +18,7 @@ import net.minecraft.server.v1_12_R1.ItemStack;
 import net.minecraft.server.v1_12_R1.StatisticList;
 import net.minecraft.server.v1_12_R1.World;
 
-public class CustomItemDrink extends CustomItemFoodDrinkAbstract {
+public class CustomItemDrink extends CustomItemFoodDrinkExtend {
 
 	public CustomItemDrink(String name, ItemModel model, String texture) {
 		super(name, model, texture);

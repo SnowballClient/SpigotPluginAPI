@@ -5,10 +5,12 @@ import java.util.List;
 
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.golde.snowball.api.object.CustomCreativeTab;
 import org.golde.snowball.api.object.CustomBlock;
+import org.golde.snowball.api.object.CustomCreativeTab;
 import org.golde.snowball.api.object.CustomEnchantment;
 import org.golde.snowball.api.object.CustomItem;
+import org.golde.snowball.api.object.CustomItemDrink;
+import org.golde.snowball.api.object.CustomItemFood;
 import org.golde.snowball.api.object.SnowballPlayer;
 import org.golde.snowball.plugin.MainPlugin;
 import org.golde.snowball.plugin.custom.CustomObject;
@@ -35,6 +37,21 @@ public class SnowballAPI {
 	public void addItem(CustomItem item) {
 		//item.do_not_use_setRegistryName(pluginIdentifier);
 		OBJECTS.add(item);
+	}
+	
+	/*
+	 * Alright, yeah this might look strange because THERETICALLY it would work if you just pass a custom food item into the additem function 
+	 * because it extends customitem, but it doesnt. Who knows. I tried for 3 hours fixing this. 
+	 * Some bug in bukkit or java made this happen. Just leave this class along and dont delete these methods what ever you do.
+	 * Same thing goes with addItem(CustomItemDrink).
+	 * 
+	 */
+	public void addItem(CustomItemFood item) {
+		addItem(item);
+	}
+	
+	public void addItem(CustomItemDrink item) {
+		addItem(item);
 	}
 	
 	public void addEnchantment(CustomEnchantment ench) {

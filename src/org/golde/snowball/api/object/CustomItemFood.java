@@ -3,13 +3,12 @@ package org.golde.snowball.api.object;
 import org.bukkit.entity.Player;
 import org.golde.snowball.api.models.ItemModel;
 import org.golde.snowball.plugin.PacketManager;
-import org.golde.snowball.plugin.custom.CustomItemFoodDrinkAbstract;
 import org.golde.snowball.plugin.packets.server.SPacketAddItem;
 
 import net.minecraft.server.v1_12_R1.Item;
 import net.minecraft.server.v1_12_R1.ItemFood;
 
-public class CustomItemFood extends CustomItemFoodDrinkAbstract {
+public class CustomItemFood extends CustomItemFoodDrinkExtend {
 
 	private int properties_food_amount = 5;
 	private float properties_food_saturation = 0.6f;
