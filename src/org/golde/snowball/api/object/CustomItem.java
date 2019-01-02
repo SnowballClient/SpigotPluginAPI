@@ -49,7 +49,7 @@ public class CustomItem extends CustomBlockItemShared {
 		PacketManager.sendPacket(player, PacketManager.S_PACKET_ADD_ITEM, new SPacketAddItem(id, name, texture, (ItemModel)model, properties_creativeTab, properties_maxStackSize, properties_glowing));
 	}
 	
-	protected class ItemDummy extends Item {
+	public class ItemDummy extends Item {
 		public ItemDummy() {
 			this.b(net.minecraft.server.v1_12_R1.CreativeModeTab.b); //This does not half to match the client.. Not sure if its even used on the server tbh
 			c("snowball_" + name); //name

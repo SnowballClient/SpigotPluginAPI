@@ -45,7 +45,7 @@ public class CustomItemFood extends CustomItemFoodDrinkExtend {
 		return new DummyItemFood();
 	}
 	
-	private class DummyItemFood extends ItemFood {
+	public class DummyItemFood extends ItemFood {
 
 		public DummyItemFood() {
 			super(properties_food_amount, properties_food_saturation, properties_food_isWolfFood);

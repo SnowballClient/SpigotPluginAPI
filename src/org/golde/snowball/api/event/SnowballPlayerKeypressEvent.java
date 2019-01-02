@@ -3,21 +3,17 @@ package org.golde.snowball.api.event;
 import org.bukkit.entity.Player;
 import org.golde.snowball.api.object.SnowballPlayer;
 import org.golde.snowball.plugin.event.SnowballEvent;
+import org.golde.snowball.plugin.event.SnowballEventPlayer;
 
-public class SnowballPlayerKeypressEvent extends SnowballEvent {
-
-	private final SnowballPlayer player;
+public class SnowballPlayerKeypressEvent extends SnowballEventPlayer {
+	
 	private int key;
 	private boolean isInGuiWindow;
 	
 	public SnowballPlayerKeypressEvent(SnowballPlayer player, int key, boolean isInGuiWindow) {
-		this.player = player;
+		super(player);
 		this.key = key;
 		this.isInGuiWindow = isInGuiWindow;
-	}
-	
-	public SnowballPlayer getPlayer() {
-		return player;
 	}
 	
 	public int getKey() {

@@ -34,7 +34,7 @@ public class CustomItemDrink extends CustomItemFoodDrinkExtend {
 		return new DummyItemDrinkable();
 	}
 	
-	private class DummyItemDrinkable extends ItemDummy {
+	public class DummyItemDrinkable extends ItemDummy {
 		
 		@Override
 	    public ItemStack a(final ItemStack itemStack, final World world, final EntityLiving entityliving) {

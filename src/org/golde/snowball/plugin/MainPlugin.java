@@ -15,21 +15,29 @@ import org.bukkit.World.Environment;
 import org.bukkit.WorldCreator;
 import org.bukkit.WorldType;
 import org.bukkit.craftbukkit.v1_12_R1.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_12_R1.inventory.CraftItemStack;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerChangedWorldEvent;
+import org.bukkit.event.player.PlayerItemConsumeEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerLoginEvent.Result;
 import org.bukkit.event.player.PlayerRespawnEvent;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.plugin.messaging.PluginMessageListener;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.golde.snowball.api.SnowballAPI;
+import org.golde.snowball.api.event.SnowballPlayerItemDrinkEvent;
+import org.golde.snowball.api.event.SnowballPlayerItemEatEvent;
 import org.golde.snowball.api.object.CustomCreativeTab;
+import org.golde.snowball.api.object.CustomItemDrink.DummyItemDrinkable;
+import org.golde.snowball.api.object.CustomItemFood.DummyItemFood;
 import org.golde.snowball.api.object.SnowballPlayer;
 import org.golde.snowball.plugin.custom.CustomObject;
 import org.golde.snowball.plugin.packets.server.SPacketInfo;
@@ -239,6 +247,32 @@ public class MainPlugin extends JavaPlugin implements Listener, PluginMessageLis
 			}
 		}.runTaskLater(this, 0); //Yeah, run task later 0 ticks works... 1 and no-delay fail. Its strange.
 
+	}
+	
+	@EventHandler(ignoreCancelled = true, priority= EventPriority.LOWEST)
+	public void onItemConsume(PlayerItemConsumeEvent e) {
+		Player player = e.getPlayer();
+		SnowballPlayer snowballPlayer = getOrCreateSnowballPlayer(player);
+		ItemStack is = e.getItem();
+		net.minecraft.server.v1_12_R1.ItemStack nmsIs = CraftItemStack.asNMSCopy(is);
+		if(is.getType() == Material.POTION || nmsIs.getItem() instanceof DummyItemDrinkable) {
+			SnowballPlayerItemDrinkEvent event = new SnowballPlayerItemDrinkEvent(snowballPlayer, is);
+			event.call();
+			if(event.isCancelled()) {
+				e.setCancelled(true);
+			}
+			
+		}
+		
+		if(is.getType().isEdible() || nmsIs.getItem() instanceof DummyItemFood) {
+			SnowballPlayerItemEatEvent event = new SnowballPlayerItemEatEvent(snowballPlayer, is);
+			event.call();
+			if(event.isCancelled()) {
+				e.setCancelled(true);
+			}
+			
+		}
+		
 	}
 
 	private static Comparator<CustomObject> customObjectComparator = new Comparator<CustomObject>() {
