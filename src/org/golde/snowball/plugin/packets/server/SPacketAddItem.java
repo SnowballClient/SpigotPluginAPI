@@ -77,22 +77,25 @@ public class SPacketAddItem extends SPacket {
 		properties.setInt(NBTConstants.KEY_ITEM_PROPERTIES_MAX_STACK_SIZE, properties_maxStackSize);
 		
 		if(itemType != ItemType.ITEM) {
-			tag.setInt(NBTConstants.KEY_ITEM_FOOD_DRINK_PROPERTIES_DURATION, properties_food_drink_maxItemUseDuration);
+			properties.setInt(NBTConstants.KEY_ITEM_FOOD_DRINK_PROPERTIES_DURATION, properties_food_drink_maxItemUseDuration);
 		}
 		
 		if(itemType == ItemType.DRINK) {
-			tag.setBoolean(NBTConstants.KEY_ITEM_IS_DRINKABLE, true);
+			properties.setBoolean(NBTConstants.KEY_ITEM_IS_DRINKABLE, true);
 		}
 		
 		if(itemType == ItemType.FOOD) {
-			tag.setInt(NBTConstants.KEY_ITEM_FOOD_PROPERTIES_AMOUNT, properties_food_amount);
-			tag.setFloat(NBTConstants.KEY_ITEM_FOOD_PROPERTIES_SATURATION, properties_food_saturation);
-			tag.setBoolean(NBTConstants.KEY_ITEM_FOOD_PROPERTIES_WOLF_FOOD, properties_food_isWolfFood);
-			tag.setBoolean(NBTConstants.KEY_ITEM_FOOD_PROPERTIES_ALWAYS_EDITABLE, properties_food_alwaysEdible);
+			properties.setBoolean(NBTConstants.KEY_ITEM_IS_FOOD, true);
+			properties.setInt(NBTConstants.KEY_ITEM_FOOD_PROPERTIES_AMOUNT, properties_food_amount);
+			properties.setFloat(NBTConstants.KEY_ITEM_FOOD_PROPERTIES_SATURATION, properties_food_saturation);
+			properties.setBoolean(NBTConstants.KEY_ITEM_FOOD_PROPERTIES_WOLF_FOOD, properties_food_isWolfFood);
+			properties.setBoolean(NBTConstants.KEY_ITEM_FOOD_PROPERTIES_ALWAYS_EDITABLE, properties_food_alwaysEdible);
 		}
 		
 		tag.set(NBTConstants.KEY_PROPERTIES, properties);
 		
+		System.out.println("Properties Tag for " + id + " : " + tag.toString());
+		System.out.println("");
 		data.a(tag);
 	}
 
