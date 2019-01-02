@@ -18,12 +18,9 @@ public class CustomCreativeTab extends CustomObjectName {
 	public CustomCreativeTab(String name, org.bukkit.inventory.ItemStack iconIn) {
 		super(name);
 		if(iconIn == null) {
-			System.out.println("i is null");
 			iconIn = new org.bukkit.inventory.ItemStack(Material.AIR);
 		}
-		System.out.println("ICON: " + iconIn.getI18NDisplayName());
 		this.icon = org.bukkit.craftbukkit.v1_12_R1.inventory.CraftItemStack.asNMSCopy(iconIn); //turn bukkit itemstack into net.minecraft itemstack
-		System.out.println("ICON2: " + icon.getName());
 	}
 
 	@Override
@@ -36,5 +33,9 @@ public class CustomCreativeTab extends CustomObjectName {
 
 	@Override
 	public int getId() {return 0; /* This does not matter, creative tabs do not have ids */}
+	
+	public final String getUnlocalizedName() {
+		return unlocalizedName;
+	}
 	
 }

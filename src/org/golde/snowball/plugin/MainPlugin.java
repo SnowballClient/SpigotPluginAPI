@@ -110,7 +110,7 @@ public class MainPlugin extends JavaPlugin implements Listener, PluginMessageLis
 		for(CustomObject obj : SnowballAPI.do_not_use_me_getObjects()) {
 			obj.registerServer();
 			toBeSentToClients.add(obj);
-			if(DEBUG) {Bukkit.getLogger().info("Registering Custom Object: " + obj.getClass().getSimpleName() + "(" + obj.getClass().getSuperclass().getSimpleName() + "");}
+			if(DEBUG) {Bukkit.getLogger().info("Registering Custom Object: " + obj.getClass().getSimpleName());}
 		}
 
 	}

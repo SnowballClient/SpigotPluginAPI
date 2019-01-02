@@ -21,13 +21,15 @@ import net.minecraft.server.v1_12_R1.MinecraftKey;
 
 public class CustomBlock extends CustomBlockItemShared {
 
-	private float properties_light = NBTConstants.INT_NULL;
+	private float properties_light = /*NBTConstants.INT_NULL*/ 0;
 	private float properties_resistance = 10.0F;
 	private float properties_hardness = 1.5F;
 	private boolean properties_transparent = false;
 	private SnowballMaterial properties_material = SnowballMaterial.STONE;
 	private boolean properties_silktouch = false;
 	private SnowballStepSound properties_stepsound = SnowballStepSound.STONE;
+	
+	private CustomCreativeTab properties_creativeTab = null;
 	
 	public CustomBlock(String name, BlockModel model, String texture) {
 		super(name, texture, model);	
@@ -65,6 +67,10 @@ public class CustomBlock extends CustomBlockItemShared {
 	public void setStepSound(SnowballStepSound stepsound) {
 		this.properties_stepsound = stepsound;
 	}
+	
+	public void setCreativeTab(CustomCreativeTab creativeTab) {
+		this.properties_creativeTab = creativeTab;
+	}
 
 	@Override
 	public void registerServer() {
@@ -85,7 +91,7 @@ public class CustomBlock extends CustomBlockItemShared {
 	
 	@Override
 	public void registerClient(org.bukkit.entity.Player player) {
-		PacketManager.sendPacket(player, PacketManager.S_PACKET_ADD_BLOCK, new SPacketAddBlock(registryName, id, name, texture, (BlockModel) model, properties_light, properties_resistance, properties_hardness, properties_transparent, properties_material, properties_silktouch, properties_stepsound));
+		PacketManager.sendPacket(player, PacketManager.S_PACKET_ADD_BLOCK, new SPacketAddBlock(registryName, id, name, texture, (BlockModel) model, properties_light, properties_resistance, properties_hardness, properties_transparent, properties_material, properties_silktouch, properties_stepsound, properties_creativeTab));
 	}
 	
 	private class BlockDummy extends net.minecraft.server.v1_12_R1.Block {
@@ -98,6 +104,7 @@ public class CustomBlock extends CustomBlockItemShared {
 			c(properties_hardness); //hardness
 			b(properties_resistance); //resistance
 			a(properties_stepsound.getServer()); //stepsound
+			a(properties_light); //light [blockLight = (int) 15 * light);]
 		}
 		
 		@Override

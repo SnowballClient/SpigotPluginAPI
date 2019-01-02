@@ -12,15 +12,15 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.golde.snowball.plugin.MainPlugin;
 import org.golde.snowball.plugin.PacketManager;
 import org.golde.snowball.plugin.packets.server.SPacketShowToast;
-import org.golde.snowball.plugin.packets.server.SPacketUpdatePlayerLooks;
-import org.golde.snowball.shared.enums.EnumCosmetic;
+import org.golde.snowball.plugin.packets.server.SPacketTTS;
+import org.golde.snowball.plugin.packets.server.SPacketUpdatePlayerSkin;
+import org.golde.snowball.plugin.packets.server.SPacketUpdatePlayerUsername;
 
 public class SnowballPlayer {
 
 	private final Player player;
 	private String skinUrl = "null";
 	private String customUsername;
-	private List<EnumCosmetic> cosmetics = new ArrayList<EnumCosmetic>();
 
 	public SnowballPlayer(Player player) {
 		this.player = player;
@@ -49,7 +49,9 @@ public class SnowballPlayer {
 
 	public void setCustomSkin(String skinUrl) {
 		this.skinUrl = skinUrl;
-		sendCustomUpdatePacket();
+		for(Player p : Bukkit.getOnlinePlayers()) {
+			PacketManager.sendPacket(p, PacketManager.S_PACKET_UPDATE_PLAYER_SKIN, new SPacketUpdatePlayerSkin(player, skinUrl));
+		}
 	}
 
 	public void resetCustomUsername() {
@@ -62,30 +64,8 @@ public class SnowballPlayer {
 		}
 		customUsername = name;
 		player.setPlayerListName(name);
-		sendCustomUpdatePacket();
-	}
-
-	public void addCosmetic(EnumCosmetic... cosmeticIn) {
-		for(EnumCosmetic cos : cosmeticIn) {
-			if(!cosmetics.contains(cos) && cos != null) {
-				cosmetics.add(cos);
-			}
-		}
-		sendCustomUpdatePacket();
-	}
-
-	public void removeCosmetic(EnumCosmetic... cosmeticIn) {
-		for(EnumCosmetic cos : cosmeticIn) {
-			if(cosmetics.contains(cos)) {
-				cosmetics.remove(cos);
-			}
-		}
-		sendCustomUpdatePacket();
-	}
-
-	private void sendCustomUpdatePacket() {
 		for(Player p : Bukkit.getOnlinePlayers()) {
-			PacketManager.sendPacket(p, PacketManager.S_PACKET_UPDATE_PLAYER_LOOKS, new SPacketUpdatePlayerLooks(player, skinUrl, customUsername, cosmetics)); //Change to a updateCustomisations() function so you can change a lot of things then push it all at once to the client?
+			PacketManager.sendPacket(p, PacketManager.S_PACKET_UPDATE_PLAYER_USERNAME, new SPacketUpdatePlayerUsername(player, customUsername));
 		}
 	}
 	
@@ -101,6 +81,10 @@ public class SnowballPlayer {
 				player.teleport(PLAYER_LOCATION, TeleportCause.PLUGIN);
 			}
 		}.runTaskLater(MainPlugin.getInstance(), 2);
+	}
+	
+	public void sendTTS(String msg) {
+		PacketManager.sendPacket(player, PacketManager.S_PACKET_TTS, new SPacketTTS(msg));
 	}
 
 }

@@ -15,7 +15,10 @@ import org.golde.snowball.plugin.packets.server.SPacketAddItem;
 import org.golde.snowball.plugin.packets.server.SPacketInfo;
 import org.golde.snowball.plugin.packets.server.SPacketRefreshResources;
 import org.golde.snowball.plugin.packets.server.SPacketShowToast;
-import org.golde.snowball.plugin.packets.server.SPacketUpdatePlayerLooks;
+import org.golde.snowball.plugin.packets.server.SPacketTTS;
+import org.golde.snowball.plugin.packets.server.SPacketUpdatePlayerSkin;
+import org.golde.snowball.plugin.packets.server.SPacketUpdatePlayerUsername;
+import org.golde.snowball.shared.Constants;
 
 import com.comphenix.protocol.PacketType;
 import com.comphenix.protocol.PacketType.Protocol;
@@ -38,10 +41,12 @@ public class PacketManager {
 	public static final PacketType S_PACKET_ADD_ITEM = new PacketType(Protocol.PLAY, Sender.SERVER, PacketIds.SPacketAddItem, -1);
 	public static final PacketType S_PACKET_REFRESH_RESOURCES = new PacketType(Protocol.PLAY, Sender.SERVER, PacketIds.SPacketRefreshResources, -1);
 	public static final PacketType S_PACKET_INFO = new PacketType(Protocol.PLAY, Sender.SERVER, PacketIds.SPacketInfo, -1);
-	public static final PacketType S_PACKET_UPDATE_PLAYER_LOOKS = new PacketType(Protocol.PLAY, Sender.SERVER, PacketIds.SPacketUpdatePlayerLooks, -1);
 	public static final PacketType S_PACKET_SHOW_TOAST = new PacketType(Protocol.PLAY, Sender.SERVER, PacketIds.SPacketShowToast, -1);
 	public static final PacketType S_PACKET_ADD_ENCHANTMENT = new PacketType(Protocol.PLAY, Sender.SERVER, PacketIds.SPacketAddEnchantment, -1);
 	public static final PacketType S_PACKET_ADD_CREATIVE_TAB = new PacketType(Protocol.PLAY, Sender.SERVER, PacketIds.SPacketAddCreativeTab, -1);
+	public static final PacketType S_PACKET_TTS = new PacketType(Protocol.PLAY, Sender.SERVER, PacketIds.SPacketTTS, -1);
+	public static final PacketType S_PACKET_UPDATE_PLAYER_SKIN = new PacketType(Protocol.PLAY, Sender.SERVER, PacketIds.SPacketUpdatePlayerSkin, -1);
+	public static final PacketType S_PACKET_UPDATE_PLAYER_USERNAME = new PacketType(Protocol.PLAY, Sender.SERVER, PacketIds.SPacketUpdatePlayerUsername, -1);
 	
 	public static final PacketType C_PACKET_KEYPRESS = new PacketType(Protocol.PLAY, Sender.CLIENT, PacketIds.CPacketKeyPress, -1);
 	
@@ -51,10 +56,12 @@ public class PacketManager {
 		registerPacket(SPacketAddItem.class, S_PACKET_ADD_ITEM);
 		registerPacket(SPacketRefreshResources.class, S_PACKET_REFRESH_RESOURCES);
 		registerPacket(SPacketInfo.class, S_PACKET_INFO);
-		registerPacket(SPacketUpdatePlayerLooks.class, S_PACKET_UPDATE_PLAYER_LOOKS);
 		registerPacket(SPacketShowToast.class, S_PACKET_SHOW_TOAST);
 		registerPacket(SPacketAddEnchantment.class, S_PACKET_ADD_ENCHANTMENT);
 		registerPacket(SPacketAddCreativeTab.class, S_PACKET_ADD_CREATIVE_TAB);
+		registerPacket(SPacketTTS.class, S_PACKET_TTS);
+		registerPacket(SPacketUpdatePlayerSkin.class, S_PACKET_UPDATE_PLAYER_SKIN);
+		registerPacket(SPacketUpdatePlayerUsername.class, S_PACKET_UPDATE_PLAYER_USERNAME);
 		
 		registerPacket(CPacketKeyPress.class, C_PACKET_KEYPRESS);
 		
@@ -101,8 +108,8 @@ public class PacketManager {
 			@Override
 			public void onPacketSending(PacketEvent event) {
 				WrappedServerPing ping = (WrappedServerPing)event.getPacket().getServerPings().read(0);
-				ping.setVersionProtocol(-89294);
-				ping.setVersionName("Snowball v1.0.0");
+				ping.setVersionProtocol(Constants.PROTOCOL_VERSION);
+				ping.setVersionName("Snowball v" + Constants.SNOWBALL_VERSION);
 			}
 			
 		});

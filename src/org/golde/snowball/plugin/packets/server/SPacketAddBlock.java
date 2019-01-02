@@ -6,6 +6,7 @@ import org.bukkit.Bukkit;
 import org.golde.snowball.api.enums.SnowballMaterial;
 import org.golde.snowball.api.enums.SnowballStepSound;
 import org.golde.snowball.api.models.BlockModel;
+import org.golde.snowball.api.object.CustomCreativeTab;
 import org.golde.snowball.plugin.models.Model;
 import org.golde.snowball.plugin.packets.SnowballPacket;
 import org.golde.snowball.shared.nbt.NBTConstants;
@@ -29,8 +30,9 @@ public class SPacketAddBlock extends SPacket {
 	private final SnowballMaterial properties_material;
 	private final boolean properties_silktouch;
 	private final SnowballStepSound properties_stepsound;
+	private final CustomCreativeTab properties_tab;
 
-	public SPacketAddBlock(String registryName, int id, String name, String texture, BlockModel model, float properties_light, float properties_resistance, float properties_hardness, boolean properties_transparent, SnowballMaterial property_material, boolean property_silktouch, SnowballStepSound properties_stepsound) {
+	public SPacketAddBlock(String registryName, int id, String name, String texture, BlockModel model, float properties_light, float properties_resistance, float properties_hardness, boolean properties_transparent, SnowballMaterial property_material, boolean property_silktouch, SnowballStepSound properties_stepsound, CustomCreativeTab properties_tab) {
 		this.registryName = registryName;
 		this.id = id;
 		this.name = name;
@@ -43,6 +45,7 @@ public class SPacketAddBlock extends SPacket {
 		this.properties_material = property_material;
 		this.properties_silktouch = property_silktouch;
 		this.properties_stepsound = properties_stepsound;
+		this.properties_tab = properties_tab;
 	}
 
 	@Override
@@ -66,6 +69,7 @@ public class SPacketAddBlock extends SPacket {
 		properties.setString(NBTConstants.KEY_BLOCK_PROPERTIES_MATERIAL, properties_material.name());
 		properties.setBoolean(NBTConstants.KEY_BLOCK_PROPERTIES_SILKTOUCH, properties_silktouch);
 		properties.setString(NBTConstants.KEY_BLOCK_PROPERTIES_STEPSOUND, properties_stepsound.name());
+		properties.setString(NBTConstants.KEY_BLOCK_ITEM_TAB, properties_tab == null ? "null" : properties_tab.getUnlocalizedName());
 		
 		tag.set(NBTConstants.KEY_PROPERTIES, properties);
 		
