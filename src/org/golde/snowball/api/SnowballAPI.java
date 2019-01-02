@@ -47,11 +47,11 @@ public class SnowballAPI {
 	 * 
 	 */
 	public void addItem(CustomItemFood item) {
-		addItem(item);
+		OBJECTS.add(item);
 	}
 	
 	public void addItem(CustomItemDrink item) {
-		addItem(item);
+		OBJECTS.add(item);
 	}
 	
 	public void addEnchantment(CustomEnchantment ench) {
