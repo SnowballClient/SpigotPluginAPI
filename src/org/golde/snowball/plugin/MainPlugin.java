@@ -10,10 +10,12 @@ import java.util.Map;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.World.Environment;
 import org.bukkit.WorldCreator;
 import org.bukkit.WorldType;
+import org.bukkit.command.CommandSender;
 import org.bukkit.craftbukkit.v1_12_R1.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_12_R1.inventory.CraftItemStack;
 import org.bukkit.enchantments.Enchantment;
@@ -23,11 +25,13 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerChangedWorldEvent;
+import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.event.player.PlayerItemConsumeEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerLoginEvent.Result;
 import org.bukkit.event.player.PlayerRespawnEvent;
+import org.bukkit.event.server.ServerCommandEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.plugin.messaging.PluginMessageListener;
@@ -273,6 +277,44 @@ public class MainPlugin extends JavaPlugin implements Listener, PluginMessageLis
 			
 		}
 		
+	}
+	
+	@EventHandler(ignoreCancelled = true, priority = EventPriority.LOWEST)
+	public void playerCommandEvent(PlayerCommandPreprocessEvent e) {
+		e.setCancelled(prossessCommand(e.getPlayer(), e.getMessage()));
+	}
+	
+	@EventHandler(ignoreCancelled = true, priority = EventPriority.LOWEST)
+	public void serverCommandEvent(ServerCommandEvent e) {
+		e.setCancelled(prossessCommand(e.getSender(), e.getCommand()));
+	}
+	
+	//Somebody who doesn't know what /reload does would try it. Same with plugman. We should stop that! It breaks everything!
+	public boolean prossessCommand(CommandSender sender, String cmd) {
+		if(cmd.startsWith("/")) {
+			cmd = cmd.substring(1);
+		}
+		if(cmd.equalsIgnoreCase("reload") || 
+				cmd.equalsIgnoreCase("rl") || 
+				cmd.equalsIgnoreCase("plugman enable SnowballAPI") ||
+				cmd.equalsIgnoreCase("plugman disable SnowballAPI") ||
+				cmd.equalsIgnoreCase("plugman load SnowballAPI") ||
+				cmd.equalsIgnoreCase("plugman unload SnowballAPI") ||
+				cmd.equalsIgnoreCase("plugman restart SnowballAPI") ||
+				cmd.equalsIgnoreCase("plugman reload SnowballAPI") ||
+				
+				cmd.equalsIgnoreCase("plugman enable SnowballYML") ||
+				cmd.equalsIgnoreCase("plugman disable SnowballYML") ||
+				cmd.equalsIgnoreCase("plugman load SnowballYML") ||
+				cmd.equalsIgnoreCase("plugman unload SnowballYML") ||
+				cmd.equalsIgnoreCase("plugman restart SnowballYML") ||
+				cmd.equalsIgnoreCase("plugman reload SnowballYML")
+				
+				) {
+			sender.sendMessage(ChatColor.RED + "Snowball does not support the '/" + cmd + "' command. Please do '/stop' or '/restart'.");
+			return true;
+		}
+		return false;
 	}
 
 	private static Comparator<CustomObject> customObjectComparator = new Comparator<CustomObject>() {
